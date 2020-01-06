@@ -7,7 +7,7 @@ import torchvision
 from mymodel import Model
 from tqdm import tqdm
 from LSUV import LSUVinit
-
+from torchsummary import summary
 
 
 load = False
@@ -24,7 +24,10 @@ class fc(nn.Module):
 
 if __name__ == '__main__':
 	# Load the Model
-	model = torchvision.models.resnext101_32x8d().to(device)
+	#model = torchvision.models.resnext101_32x8d().to(device)
+	model = Model(200).to(device)
+	model.device = device
+	summary(model, (3,224,224))
 	if load == False:
 		model.init = False
 		model.iter = 0
@@ -38,7 +41,7 @@ if __name__ == '__main__':
 							std=[0.229, 0.224, 0.225])
 		])
 	dataset = torchvision.datasets.ImageFolder("imagenet-a", transform = transforms)
-	trainloader = torch.utils.data.DataLoader(dataset, batch_size=64, shuffle=True, num_workers=4)
+	trainloader = torch.utils.data.DataLoader(dataset, batch_size=32, shuffle=True, num_workers=4)
 
 	#Optimizer
 	optimizer = torch.optim.Adam(model.parameters(), lr = 3e-4)
@@ -55,7 +58,7 @@ if __name__ == '__main__':
 
 			# Layer Sequential Unit Variance (LSUV) Initialization
 			if epoch == 0 and q == 0 and load == False and model.init == False:
-				model = LSUVinit(model, I, std_tol= 1e-3, cuda=True)
+				#model = LSUVinit(model, I, std_tol= 1e-3, cuda=True)
 				model.init = True
 
 			# Forward Pass
